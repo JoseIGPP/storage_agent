@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { streamText, tool } from "ai";
-import { openai } from "@ai-sdk/openai";
+import { google } from "@ai-sdk/google";
 import fs from "fs";
 import path from "path";
 
@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
     const systemPrompt = loadSystemInstructions();
 
     const result = streamText({
-      model: openai("gpt-4o-mini"),
+      model: google("gemini-3.1-flash-lite"),
       system: systemPrompt,
       messages,
       tools: {

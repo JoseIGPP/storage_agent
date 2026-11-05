@@ -199,27 +199,27 @@ export default function InventoryPage(): React.ReactElement {
               ) : (
                 products.map((prod) => {
                   // Lógica del semáforo tricolor
-                  const isUnder = prod.stock_actual < prod.stock_minimo;
-                  const isExact = prod.stock_actual === prod.stock_minimo;
+                  const isUnder = prod.stock_quantity < prod.min_stock;
+                  const isExact = prod.stock_quantity === prod.min_stock;
 
                   return (
                     <tr key={prod.id} className="hover:bg-slate-800/40 transition-colors">
-                      <td className="px-4 py-3 font-medium text-white">{prod.nombre}</td>
+                      <td className="px-4 py-3 font-medium text-white">{prod.name}</td>
                       <td className="px-4 py-3 font-mono text-slate-400">
-                        {prod.codigo_barras || "-"}
+                        {prod.barcode || "-"}
                       </td>
-                      <td className="px-4 py-3 text-slate-400">{prod.categoria}</td>
+                      <td className="px-4 py-3 text-slate-400">{prod.category}</td>
                       <td className="px-4 py-3 text-right text-slate-400">
-                        {formatCurrency(prod.precio_costo)}
+                        {formatCurrency(prod.cost_price)}
                       </td>
                       <td className="px-4 py-3 text-right font-semibold text-white">
-                        {formatCurrency(prod.precio_venta)}
+                        {formatCurrency(prod.sale_price)}
                       </td>
                       <td className="px-4 py-3 text-center font-bold text-white">
-                        {prod.stock_actual}
+                        {prod.stock_quantity}
                       </td>
                       <td className="px-4 py-3 text-center text-slate-400">
-                        {prod.stock_minimo}
+                        {prod.min_stock}
                       </td>
                       <td className="px-4 py-3 text-center">
                         {isUnder ? (
@@ -252,7 +252,7 @@ export default function InventoryPage(): React.ReactElement {
                             <Edit2 className="w-3.5 h-3.5" />
                           </button>
                           <button
-                            onClick={() => void handleDelete(prod.id, prod.nombre)}
+                            onClick={() => void handleDelete(prod.id, prod.name)}
                             className="p-1.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
                             title="Eliminar"
                           >

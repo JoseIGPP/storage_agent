@@ -10,6 +10,6 @@
   - 90 días de historial simulado de ventas.
   - 5 compras de reabastecimiento.
   - 6 gastos operativos recurrentes (luz, bolsas, renta).
-- [ ] **T-01-4**: Probar manualmente la migración en Supabase o contenedor PostgreSQL local.
-- [ ] **T-01-5**: Verificar mediante inserciones de prueba que `trg_sales_reduce_stock` descuenta el stock correctamente y `trg_purchases_increase_stock` lo incrementa.
+- [x] **T-01-4**: Probar manualmente la migración en Supabase o contenedor PostgreSQL local.
+- [x] **T-01-5**: Verificar mediante inserciones de prueba que `trg_sales_reduce_stock` descuenta el stock correctamente y `trg_purchases_increase_stock` lo incrementa.
 - [ ] **T-01-6**: Validar que las políticas RLS bloquean accesos anónimos no autorizados.

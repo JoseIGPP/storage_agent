@@ -2,7 +2,7 @@
 
 /**
  * Modal interactivo para crear y editar productos en el catálogo de inventario.
- * Valida márgenes de ganancia (precio_venta >= precio_costo) y stocks no negativos.
+ * Valida márgenes de ganancia (sale_price >= cost_price) y stocks no negativos.
  */
 
 import React, { useState, useEffect } from "react";
@@ -10,13 +10,13 @@ import { X, Loader2, Save, PackagePlus, Edit } from "lucide-react";
 
 export interface InventoryProduct {
   id?: string;
-  nombre: string;
-  codigo_barras: string | null;
-  categoria: string;
-  precio_costo: number;
-  precio_venta: number;
-  stock_actual: number;
-  stock_minimo: number;
+  name: string;
+  barcode: string | null;
+  category: string;
+  cost_price: number;
+  sale_price: number;
+  stock_quantity: number;
+  min_stock: number;
 }
 
 interface ProductModalProps {
@@ -46,13 +46,13 @@ export function ProductModal({
   const isEditing = Boolean(productToEdit?.id);
 
   const [formData, setFormData] = useState({
-    nombre: "",
-    codigo_barras: "",
-    categoria: "Abarrotes",
-    precio_costo: "",
-    precio_venta: "",
-    stock_actual: "",
-    stock_minimo: "5",
+    name: "",
+    barcode: "",
+    category: "Abarrotes",
+    cost_price: "",
+    sale_price: "",
+    stock_quantity: "",
+    min_stock: "5",
   });
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -60,23 +60,23 @@ export function ProductModal({
   useEffect(() => {
     if (productToEdit) {
       setFormData({
-        nombre: productToEdit.nombre || "",
-        codigo_barras: productToEdit.codigo_barras || "",
-        categoria: productToEdit.categoria || "Abarrotes",
-        precio_costo: productToEdit.precio_costo?.toString() || "",
-        precio_venta: productToEdit.precio_venta?.toString() || "",
-        stock_actual: productToEdit.stock_actual?.toString() || "",
-        stock_minimo: productToEdit.stock_minimo?.toString() || "5",
+        name: productToEdit.name || "",
+        barcode: productToEdit.barcode || "",
+        category: productToEdit.category || "Abarrotes",
+        cost_price: productToEdit.cost_price?.toString() || "",
+        sale_price: productToEdit.sale_price?.toString() || "",
+        stock_quantity: productToEdit.stock_quantity?.toString() || "",
+        min_stock: productToEdit.min_stock?.toString() || "5",
       });
     } else {
       setFormData({
-        nombre: "",
-        codigo_barras: "",
-        categoria: "Abarrotes",
-        precio_costo: "",
-        precio_venta: "",
-        stock_actual: "0",
-        stock_minimo: "5",
+        name: "",
+        barcode: "",
+        category: "Abarrotes",
+        cost_price: "",
+        sale_price: "",
+        stock_quantity: "0",
+        min_stock: "5",
       });
     }
     setError(null);
@@ -88,12 +88,12 @@ export function ProductModal({
     e.preventDefault();
     setError(null);
 
-    const costo = parseFloat(formData.precio_costo) || 0;
-    const venta = parseFloat(formData.precio_venta) || 0;
-    const stockActual = parseInt(formData.stock_actual, 10) || 0;
-    const stockMinimo = parseInt(formData.stock_minimo, 10) || 0;
+    const costo = parseFloat(formData.cost_price) || 0;
+    const venta = parseFloat(formData.sale_price) || 0;
+    const stockActual = parseInt(formData.stock_quantity, 10) || 0;
+    const stockMinimo = parseInt(formData.min_stock, 10) || 0;
 
-    if (!formData.nombre.trim()) {
+    if (!formData.name.trim()) {
       setError("El nombre del producto es obligatorio.");
       return;
     }
@@ -111,13 +111,13 @@ export function ProductModal({
     setIsSubmitting(true);
     try {
       const payload = {
-        nombre: formData.nombre.trim(),
-        codigo_barras: formData.codigo_barras.trim() || null,
-        categoria: formData.categoria,
-        precio_costo: costo,
-        precio_venta: venta,
-        stock_actual: stockActual,
-        stock_minimo: stockMinimo,
+        name: formData.name.trim(),
+        barcode: formData.barcode.trim() || null,
+        category: formData.category,
+        cost_price: costo,
+        sale_price: venta,
+        stock_quantity: stockActual,
+        min_stock: stockMinimo,
       };
 
       const url = isEditing ? `/api/products/${productToEdit?.id}` : "/api/products";
@@ -180,8 +180,8 @@ export function ProductModal({
             <input
               type="text"
               required
-              value={formData.nombre}
-              onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               placeholder="Ej. Leche Evaporada Gloria 400g"
               className="w-full bg-slate-950 text-white px-3.5 py-2 rounded-lg border border-slate-800 text-sm focus:outline-none focus:border-emerald-500"
             />
@@ -194,8 +194,8 @@ export function ProductModal({
               </label>
               <input
                 type="text"
-                value={formData.codigo_barras}
-                onChange={(e) => setFormData({ ...formData, codigo_barras: e.target.value })}
+                value={formData.barcode}
+                onChange={(e) => setFormData({ ...formData, barcode: e.target.value })}
                 placeholder="Ej. 7751234567890"
                 className="w-full bg-slate-950 text-white px-3.5 py-2 rounded-lg border border-slate-800 text-sm focus:outline-none focus:border-emerald-500"
               />
@@ -206,8 +206,8 @@ export function ProductModal({
                 Categoría
               </label>
               <select
-                value={formData.categoria}
-                onChange={(e) => setFormData({ ...formData, categoria: e.target.value })}
+                value={formData.category}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                 className="w-full bg-slate-950 text-white px-3.5 py-2 rounded-lg border border-slate-800 text-sm focus:outline-none focus:border-emerald-500"
               >
                 {CATEGORIES.map((cat) => (
@@ -228,8 +228,8 @@ export function ProductModal({
                 type="number"
                 step="0.01"
                 required
-                value={formData.precio_costo}
-                onChange={(e) => setFormData({ ...formData, precio_costo: e.target.value })}
+                value={formData.cost_price}
+                onChange={(e) => setFormData({ ...formData, cost_price: e.target.value })}
                 placeholder="0.00"
                 className="w-full bg-slate-950 text-white px-3.5 py-2 rounded-lg border border-slate-800 text-sm focus:outline-none focus:border-emerald-500"
               />
@@ -243,8 +243,8 @@ export function ProductModal({
                 type="number"
                 step="0.01"
                 required
-                value={formData.precio_venta}
-                onChange={(e) => setFormData({ ...formData, precio_venta: e.target.value })}
+                value={formData.sale_price}
+                onChange={(e) => setFormData({ ...formData, sale_price: e.target.value })}
                 placeholder="0.00"
                 className="w-full bg-slate-950 text-white px-3.5 py-2 rounded-lg border border-slate-800 text-sm focus:outline-none focus:border-emerald-500"
               />
@@ -259,8 +259,8 @@ export function ProductModal({
               <input
                 type="number"
                 required
-                value={formData.stock_actual}
-                onChange={(e) => setFormData({ ...formData, stock_actual: e.target.value })}
+                value={formData.stock_quantity}
+                onChange={(e) => setFormData({ ...formData, stock_quantity: e.target.value })}
                 placeholder="0"
                 className="w-full bg-slate-950 text-white px-3.5 py-2 rounded-lg border border-slate-800 text-sm focus:outline-none focus:border-emerald-500"
               />
@@ -273,8 +273,8 @@ export function ProductModal({
               <input
                 type="number"
                 required
-                value={formData.stock_minimo}
-                onChange={(e) => setFormData({ ...formData, stock_minimo: e.target.value })}
+                value={formData.min_stock}
+                onChange={(e) => setFormData({ ...formData, min_stock: e.target.value })}
                 placeholder="5"
                 className="w-full bg-slate-950 text-white px-3.5 py-2 rounded-lg border border-slate-800 text-sm focus:outline-none focus:border-emerald-500"
               />

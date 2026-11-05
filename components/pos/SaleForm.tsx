@@ -24,12 +24,13 @@ import { playScannerBeep } from "@/lib/utils/audio";
 
 export interface Product {
   id: string;
-  nombre: string;
-  codigo_barras: string | null;
-  categoria: string;
-  precio_venta: number;
-  stock_actual: number;
-  stock_minimo: number;
+  name: string;
+  barcode: string | null;
+  category: string;
+  cost_price?: number;
+  sale_price: number;
+  stock_quantity: number;
+  min_stock: number;
 }
 
 export interface CartItem {
@@ -86,10 +87,10 @@ export function SaleForm({ onSaleCompleted }: SaleFormProps): React.ReactElement
 
   // Agrega un producto al carrito respetando el límite de stock físico disponible
   const addProductToCart = (product: Product): void => {
-    if (product.stock_actual <= 0) {
+    if (product.stock_quantity <= 0) {
       setMessage({
         type: "error",
-        text: `El producto "${product.nombre}" no tiene stock disponible.`,
+        text: `El producto "${product.name}" no tiene stock disponible.`,
       });
       return;
     }
@@ -97,10 +98,10 @@ export function SaleForm({ onSaleCompleted }: SaleFormProps): React.ReactElement
     setCart((prevCart) => {
       const existing = prevCart.find((item) => item.product.id === product.id);
       if (existing) {
-        if (existing.quantity >= product.stock_actual) {
+        if (existing.quantity >= product.stock_quantity) {
           setMessage({
             type: "error",
-            text: `No puedes agregar más unidades. Stock disponible: ${product.stock_actual}`,
+            text: `No puedes agregar más unidades. Stock disponible: ${product.stock_quantity}`,
           });
           return prevCart;
         }
@@ -147,10 +148,10 @@ export function SaleForm({ onSaleCompleted }: SaleFormProps): React.ReactElement
           if (item.product.id === productId) {
             const newQty = item.quantity + delta;
             if (newQty <= 0) return null;
-            if (newQty > item.product.stock_actual) {
+            if (newQty > item.product.stock_quantity) {
               setMessage({
                 type: "error",
-                text: `Stock máximo alcanzado (${item.product.stock_actual} unidades).`,
+                text: `Stock máximo alcanzado (${item.product.stock_quantity} unidades).`,
               });
               return item;
             }
@@ -168,7 +169,7 @@ export function SaleForm({ onSaleCompleted }: SaleFormProps): React.ReactElement
 
   // Totales
   const totalAmount = cart.reduce(
-    (sum, item) => sum + item.product.precio_venta * item.quantity,
+    (sum, item) => sum + item.product.sale_price * item.quantity,
     0
   );
   const cashNumber = parseFloat(cashReceived) || 0;
@@ -188,9 +189,9 @@ export function SaleForm({ onSaleCompleted }: SaleFormProps): React.ReactElement
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            producto_id: item.product.id,
-            cantidad: item.quantity,
-            precio_unitario: item.product.precio_venta,
+            product_id: item.product.id,
+            quantity: item.quantity,
+            unit_price: item.product.sale_price,
           }),
         });
 
@@ -272,13 +273,13 @@ export function SaleForm({ onSaleCompleted }: SaleFormProps): React.ReactElement
                   className="w-full px-4 py-2.5 text-left flex items-center justify-between hover:bg-slate-800/80 transition-colors"
                 >
                   <div>
-                    <p className="text-sm font-medium text-white">{product.nombre}</p>
+                    <p className="text-sm font-medium text-white">{product.name}</p>
                     <p className="text-xs text-slate-400">
-                      {product.categoria} • Stock: {product.stock_actual}
+                      {product.category} • Stock: {product.stock_quantity}
                     </p>
                   </div>
                   <span className="text-sm font-bold text-emerald-400">
-                    {formatCurrency(product.precio_venta)}
+                    {formatCurrency(product.sale_price)}
                   </span>
                 </button>
               ))}
@@ -332,10 +333,10 @@ export function SaleForm({ onSaleCompleted }: SaleFormProps): React.ReactElement
                 >
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-white truncate">
-                      {item.product.nombre}
+                      {item.product.name}
                     </p>
                     <p className="text-xs text-slate-400">
-                      {formatCurrency(item.product.precio_venta)} c/u
+                      {formatCurrency(item.product.sale_price)} c/u
                     </p>
                   </div>
 
@@ -361,7 +362,7 @@ export function SaleForm({ onSaleCompleted }: SaleFormProps): React.ReactElement
                   {/* Subtotal del ítem */}
                   <div className="text-right w-20 shrink-0">
                     <p className="text-sm font-bold text-white">
-                      {formatCurrency(item.product.precio_venta * item.quantity)}
+                      {formatCurrency(item.product.sale_price * item.quantity)}
                     </p>
                   </div>
 

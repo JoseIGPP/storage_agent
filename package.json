@@ -7,9 +7,11 @@
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint",
-    "test": "vitest run"
+    "test": "vitest run",
+    "db:seed": "node scripts/seed-database.mjs"
   },
   "dependencies": {
+    "@ai-sdk/google": "^4.0.111",
     "@ai-sdk/openai": "^4.0.105",
     "@ericblade/quagga2": "^1.13.0",
     "@supabase/ssr": "^0.5.2",

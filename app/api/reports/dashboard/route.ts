@@ -130,16 +130,30 @@ export async function GET() {
       .sort((a, b) => b.units - a.units)
       .slice(0, 5)
       .map((item) => ({
-        name: item.name,
+        nombre: item.name,
         unidades: item.units,
-        ingresos: Number(item.revenue.toFixed(2)),
+        total_generado: Number(item.revenue.toFixed(2)),
       }));
 
+    const grossProfitMonth = salesMonth - cogsMonth;
+    const profitMarginPercent = salesMonth > 0 ? (netProfitMonth / salesMonth) * 100 : 0;
+
     return NextResponse.json({
-      ventas_hoy: Number(salesToday.toFixed(2)),
-      ventas_mes: Number(salesMonth.toFixed(2)),
-      ganancia_mes: Number(netProfitMonth.toFixed(2)),
-      gastos_mes: Number(expensesMonth.toFixed(2)),
+      ventas_hoy: {
+        total: Number(salesToday.toFixed(2)),
+        cantidad: (todaySales || []).length,
+      },
+      ventas_mes: {
+        total: Number(salesMonth.toFixed(2)),
+      },
+      ganancia_mes: {
+        bruta: Number(grossProfitMonth.toFixed(2)),
+        neta: Number(netProfitMonth.toFixed(2)),
+        margen_porcentaje: Number(profitMarginPercent.toFixed(1)),
+      },
+      gastos_mes: {
+        total: Number(expensesMonth.toFixed(2)),
+      },
       productos_bajo_minimo: lowStockCount,
       ordenes_pendientes: pendingOrdersCount || 0,
       top_productos_semana: topProductsWeek,
